@@ -4,8 +4,8 @@ The desktop application has its own window, application menus, native Open/Save 
 
 ## Open the application
 
-- **Mac, Apple Silicon:** Extract `KiCad-Component-Packager-0.1.10-macOS-AppleSilicon.zip` and open `KiCad Component Packager.app`. You can move the app to Applications. Tested on macOS 15.3.1; Intel Macs use the separate macOS-Intel release ZIP.
-- **Windows, x64:** Extract **the entire** `KiCad-Component-Packager-0.1.10-Windows-x64.zip`, then open `KiCad Component Packager.exe` inside its folder. Keep the adjacent files and `resources` folder together. Python and Node do not need to be installed.
+- **Mac, Apple Silicon:** Extract `KiCad-Component-Packager-0.1.11-macOS-AppleSilicon.zip` and open `KiCad Component Packager.app`. You can move the app to Applications. Tested on macOS 15.3.1; Intel Macs use the separate macOS-Intel release ZIP.
+- **Windows, x64:** Extract **the entire** `KiCad-Component-Packager-0.1.11-Windows-x64.zip`, then open `KiCad Component Packager.exe` inside its folder. Keep the adjacent files and `resources` folder together. Python and Node do not need to be installed.
 
 These are local preview builds. The Mac app has a verified ad hoc signature, without Apple Developer ID signing or notarization. The Windows executable has no publisher certificate. Public distribution signing and an installer are future release steps.
 
@@ -17,13 +17,13 @@ Install **KiCad 10+** in its normal location for Eagle/Altium conversion and sym
 2. Watch the import progress: downloaded bytes, files read, components checked, and components imported. Each stage has its own bar; downloads without a total size and KiCad conversion remain indeterminate. Review a matched symbol and footprint, then save the component to the catalog.
 3. Create libraries with **+** beside Libraries. Choose a parent for a sub-library; selecting a parent includes its children.
 4. Select a component row. The inspector shows its symbol, footprint, 3D models, properties, bundled assets, and source details.
-5. Choose **Export for KiCad…** to create a self-contained PCM ZIP. For optional direct installation into a design, use **Direct project install…**.
+5. Choose **Export ZIP…**. The Include picker offers the entire collection, the current filtered view, checked components, or the component and revision shown in the inspector. The same ZIP installs through KiCad PCM and reopens in Packager.
 
 Eagle XML `.brd` repositories (including Adafruit Qualia) open **Create module from board**. Review the suggested header pads in the top view, edit signal labels, set carrier header drill/pad sizes, and choose mounting-hole guides or unplated holes. The result is one module symbol and footprint; its outline is on F.Fab. This workflow supports header-mounted modules, not castellated/SMD interfaces. Include the `.brd`; a `.sch` alone has no pad positions.
 
 Use **Delete…** in the inspector or **Delete selected…** above checked rows to move components and all their revisions to **Recently deleted**. The sidebar opens their recovery list. Restore or permanently delete an individual component or a group. Restoring returns all revisions; installed copies and saved collections remain intact. Deleted IDs can be reimported. Restoring an older deleted copy never overwrites a newly imported component with the same ID.
 
-Libraries appear as folders in the sidebar, with categories beneath them. Select a folder to filter the list; the Library column remains visible in All components. Check rows or Shift-click to select a range. The selection bar offers **Edit properties…** and **Export selected for KiCad…**. Only checked fields are applied in the bulk editor.
+Libraries appear as folders in the sidebar, with categories beneath them. Select a folder to filter the list; the Library column remains visible in All components. Check rows or Shift-click to select a range. The selection bar offers **Move to library…**, **Edit properties…**, and **Delete selected…**. Use the toolbar’s **Export ZIP… → Checked components** to export the selection. Only checked fields are applied in the bulk editor.
 
 In the inspector, **3D model** shows the body against the pads. **Align / attach 3D models…** opens a STEP/STP/WRL file picker and XYZ offset (mm), rotation (degrees) and scale controls. Offsets, rotations, and scale update immediately in the local 3D viewport. Drag or scroll to pan, pinch or Ctrl+wheel to zoom, and right-drag to orbit. **Fit** resets the view. Symbol and footprint previews also support pan, pinch/zoom, and Fit. Choose **Save new revision** when ready. The preview shows footprint pads and outlines as an alignment reference; it does not edit a project PCB.
 
@@ -31,11 +31,11 @@ Board-derived modules also offer **Automatic module headers** in the model edito
 
 Use **Edit properties…** in the inspector to correct a name, manufacturer, part number, website, datasheet, description, category, library, or notes. Saving changed values creates a new revision. Earlier revisions remain available; unchanged values do not create a duplicate revision.
 
-**Save Library ZIP** and **Save Library ZIP As…** save the entire catalog. **Export for KiCad…** can save a selection. Both create the same PCM ZIP: install it through KiCad 10’s **Plugin and Content Manager → Install from File**, or import it back into Packager to restore the library tree, properties, models, sources and revision history. Reopening merges with the catalog, reusing identical revisions and rejecting conflicts. Existing newer local revisions remain current. Empty folders and package options are preserved; Recently deleted items and window settings are not exported. Desktop PCM ZIPs support 8 GiB unpacked, 300,000 files and 512 MiB per asset, using disk-backed storage for large catalogs. Browser uploads and ordinary source imports remain limited to 128 MiB / 10,000 entries.
+**Export ZIP…** is the single export action in the toolbar and File menu. Choose **Entire collection** to include all components and empty folders, or choose a narrower scope. The local catalog saves changes automatically. Every export uses the same PCM ZIP: install it through KiCad 10’s **Plugin and Content Manager → Install from File**, or import it back into Packager to restore the library tree, properties, models, sources and revision history. Reopening merges with the catalog, reusing identical revisions and rejecting conflicts. Existing newer local revisions remain current. Empty folders and package options are preserved; Recently deleted items and window settings are not exported. Desktop PCM ZIPs support 8 GiB unpacked, 300,000 files and 512 MiB per asset, using disk-backed storage for large catalogs. Browser uploads and ordinary source imports remain limited to 128 MiB / 10,000 entries.
 
 Open the Core PCM ZIP with **Import components** to preserve its entire symbol selection, standalone footprints and linked 3D models. Generic symbols may have no footprint assigned; they remain in the catalog.
 
-Check **Has footprint**, **Has 3D model**, or both to filter by bundled assets. **Export matching…** exports every match across all pages, together with the current library and search filters. **Save Library ZIP** always saves the complete catalog. Tables use 200 entries per page.
+Check **Has footprint**, **Has 3D model**, or both to filter by bundled assets. **Export ZIP… → Current view** exports every match across all pages, including the current library and search filters. **Entire collection** includes everything regardless of filters. Navigating to a parent folder includes all descendants and starts at the first page; explicit asset filters remain active. Tables use 200 entries per page.
 
 Click column headings to sort. Use ↑/↓ to browse rows and the sidebar or search field to filter. Drag the divider to resize the inspector, or focus it and use ←/→. Inspector tabs also support ←/→.
 
@@ -45,8 +45,7 @@ Click column headings to sort. Use ↑/↓ to browse rows and the sidebar or sea
 | ⌘/Ctrl+I | Import components |
 | ⌘/Ctrl+O | Open a library collection |
 | ⌘/Ctrl+R | Refresh the library |
-| ⌘/Ctrl+S | Save library ZIP |
-| ⌘/Ctrl+Shift+S | Save library ZIP as… |
+| ⌘/Ctrl+S | Export ZIP… |
 
 The desktop catalog is separate from the browser/CLI catalog. To transfer an existing catalog, save a saved PCM ZIP from the browser, or export one through the CLI and import it into the app. Demonstration source files are in `examples/vendor` in the repository.
 
@@ -60,7 +59,7 @@ See [the macOS and Windows build instructions](building.md) for local developmen
 
 ## Multiple open projects (0.1.4)
 
-Use **Direct project install…** to reveal optional project controls, then the + beside the project tabs. **Back to library packaging** hides them. The desktop file chooser accepts several `.kicad_pro` files at once. Each project stays in the sidebar and tab strip until you close it. Click a tab to activate its project; Ctrl+Tab cycles through open projects. Arrow keys move between focused tabs.
+Use **File → Direct Install into KiCad Project…** to reveal optional project controls, then the + beside the project tabs. **Back to library packaging** hides them. The desktop file chooser accepts several `.kicad_pro` files at once. Each project stays in the sidebar and tab strip until you close it. Click a tab to activate its project; Ctrl+Tab cycles through open projects. Arrow keys move between focused tabs.
 
 Search, component selection, checkboxes, inspector tab, sorting, library filters, and the current page are remembered separately for each project. The open project list and active project survive application restarts. Close a project with its tab’s × or File → Close Active Project (⌘/Ctrl+Shift+W). Closing removes it from the workspace and preserves its files, components, and remembered view.
 

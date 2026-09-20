@@ -22,8 +22,7 @@
     <div class="app-name" aria-label="KiCad Component Packager"><svg class="ui-icon" aria-hidden="true"><use href="#i-component"/></svg><strong>KiCad <span>Component Packager</span></strong></div>
     <div class="toolbar-group">
       <button class="tool-button" id="import-button" title="Import components (⌘/Ctrl+I)"><svg class="ui-icon"><use href="#i-import"/></svg>Import…</button>
-      <button class="tool-button" id="save-collection" title="Save library ZIP — ⌘/Ctrl+S">Save ZIP…</button>
-      <button class="tool-button" id="export-all" title="Export an installable KiCad PCM ZIP"><svg class="ui-icon"><use href="#i-export"/></svg>Export for KiCad…</button>
+      <button class="tool-button" id="export-all" title="Export a library ZIP for KiCad PCM or Packager (⌘/Ctrl+S)"><svg class="ui-icon"><use href="#i-export"/></svg>Export ZIP…</button>
       <button class="tool-button icon-only" id="refresh-button" title="Refresh workspace" aria-label="Refresh workspace"><svg class="ui-icon"><use href="#i-refresh"/></svg></button>
     </div>
     <div class="toolbar-spacer"></div><span class="toolbar-label project-only">Install target</span>
@@ -42,7 +41,7 @@
       <button class="nav-item" id="recently-deleted"><svg class="ui-icon"><use href="#i-trash"/></svg><span>Recently deleted</span></button>
       <div class="sidebar-heading library-heading" id="library-root-drop" title="Drop a library here to move it to the top level">Libraries<button class="text-button" id="new-library" aria-label="Create library">+</button></div><nav id="category-tree" aria-label="Library folders"></nav>
       <div class="sidebar-heading">Tools</div>
-      <nav aria-label="Tools"><button class="nav-item" id="direct-install"><svg class="ui-icon"><use href="#i-project"/></svg><span>Direct project install…</span></button><button class="nav-item project-only" id="library-mode"><span>← Back to library packaging</span></button>
+      <nav aria-label="Tools"><button class="nav-item project-only" id="library-mode"><span>← Back to library packaging</span></button>
         <button class="nav-item project-only" data-view="project"><svg class="ui-icon"><use href="#i-project"/></svg><span>Project libraries</span></button>
         <button class="nav-item" data-view="activity"><svg class="ui-icon"><use href="#i-clock"/></svg><span>Activity log</span></button>
       </nav>
@@ -53,8 +52,8 @@
       <section id="catalog-view" class="catalog-layout" aria-label="Component library">
         <div class="table-pane">
           <div class="panel-heading"><h1 id="view-label">All components</h1><span id="catalog-count" class="count-label"></span></div>
-          <div class="asset-filters"><label><input type="checkbox" id="has-footprint"> Has footprint</label><label><input type="checkbox" id="has-model"> Has 3D model</label><button class="text-button" id="export-matches">Export matching…</button></div><div class="filters"><label class="search"><svg class="ui-icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Search components" aria-label="Search components"><kbd>⌘ F</kbd></label><select class="project-only" id="status-filter" aria-label="Filter components"><option value="all">All parts</option><option value="installed">In project</option><option value="updates">Updates available</option></select></div>
-          <div id="selection-bar" class="selection-bar" hidden><strong id="selection-count"></strong><button class="button small" id="move-selection">Move to library…</button><button class="button small" id="edit-selection">Edit properties…</button><button class="button small" id="export-selection">Export selected for KiCad…</button><button class="button small" id="delete-selection">Delete selected…</button><button class="text-button" id="clear-selection">Clear</button></div><div id="catalog" class="table-scroll"></div><div class="pane-status" id="selection-status">Select a component to inspect its assets.</div>
+          <div class="asset-filters"><label><input type="checkbox" id="has-footprint"> Has footprint</label><label><input type="checkbox" id="has-model"> Has 3D model</label></div><div class="filters"><label class="search"><svg class="ui-icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Search components" aria-label="Search components"><kbd>⌘ F</kbd></label><select class="project-only" id="status-filter" aria-label="Filter components"><option value="all">All parts</option><option value="installed">In project</option><option value="updates">Updates available</option></select></div>
+          <div id="selection-bar" class="selection-bar" hidden><strong id="selection-count"></strong><button class="button small" id="move-selection">Move to library…</button><button class="button small" id="edit-selection">Edit properties…</button><button class="button small" id="delete-selection">Delete selected…</button><button class="text-button" id="clear-selection">Clear</button></div><div id="catalog" class="table-scroll"></div><div class="pane-status" id="selection-status">Select a component to inspect its assets.</div>
         </div>
         <div id="inspector-divider" class="pane-divider" role="separator" tabindex="0" aria-label="Resize component inspector" aria-orientation="vertical" aria-valuemin="280" aria-valuemax="560" aria-valuenow="350"></div>
         <aside id="inspector" class="inspector" aria-label="Component inspector"></aside>
@@ -62,7 +61,7 @@
       <section id="project-view" class="document-view" hidden></section><section id="activity-view" class="document-view" hidden></section>
     </main>
   </div>
-  <footer class="statusbar"><span id="workspace-status"><span class="status-dot"></span>Ready</span><span id="status-counts"></span><span class="statusbar-spacer"></span><span id="kicad-state">Checking KiCad…</span><span class="version">Version 0.1.10</span></footer>
+  <footer class="statusbar"><span id="workspace-status"><span class="status-dot"></span>Ready</span><span id="status-counts"></span><span class="statusbar-spacer"></span><span id="kicad-state">Checking KiCad…</span><span class="version">Version 0.1.11</span></footer>
   <dialog id="modal" aria-labelledby="modal-title"><div class="modal-header"><h2 id="modal-title"></h2><button class="icon-button" id="close-modal" aria-label="Close dialog">×</button></div><div id="modal-body"></div></dialog>
   <div id="toast" role="status" aria-live="polite" hidden></div><script src="/model-viewport.js" defer></script><script src="/diagram-viewer.js" defer></script><script src="/library-moves.js" defer></script><script src="/component-tools.js" defer></script><script src="/import-progress.js" defer></script><script src="/app.js" defer></script>
 </body></html>

@@ -17,8 +17,8 @@ Organize libraries into folders and inspect a component's linked assets alongsid
 - Edit manufacturer, part number, website and other properties. Changes create immutable revisions.
 - Inspect symbols, footprints and STEP/WRL models with mouse and trackpad navigation. Adjust model placement interactively.
 - Generate short or stacking male/female headers for board-derived modules and include their assembly requirements.
-- Filter by **Has footprint**, **Has 3D model**, or both, then **Export matching**. Library and text filters combine with these checks; export includes matches across all pages.
-- Save and export the same PCM ZIP format. Full saves preserve the library tree, source assets, package settings and component history; selected exports include the chosen components and their dependencies.
+- Filter by **Has footprint**, **Has 3D model**, or both, then **Export ZIP… → Current view**. Library and text filters combine with these checks; export includes matches across all pages.
+- Use one **Export ZIP…** action for the entire collection, current view, checked components, or an inspected revision. Full exports preserve the library tree, source assets, package settings and component history; narrower exports include the chosen components and their dependencies.
 
 The [Core library tools](tools/core_library/README.md) reorganize the full standard KiCad selection while preserving unpaired generic and utility symbols. Desktop PCM import supports these large collections, including standalone footprints. Asset filters describe what is bundled, rather than certifying a part’s physical suitability.
 

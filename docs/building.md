@@ -57,8 +57,8 @@ The **Desktop builds** workflow runs the Python/JavaScript tests, packages the a
 To publish a preview release, update the matching versions in `package.json`, `package-lock.json`, `pyproject.toml`, `partshelf/__init__.py` and `partshelf/static/index.html`, commit them, then push a matching tag:
 
 ```sh
-git tag v0.1.10
-git push origin v0.1.10
+git tag v0.1.11
+git push origin v0.1.11
 ```
 
 A tag run verifies the tag matches the source version. After every platform passes, the release job publishes the platform ZIPs, build manifests and checksums to GitHub Releases. Pull-request builds have read-only repository permissions; only the release job receives permission to publish.

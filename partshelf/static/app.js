@@ -217,6 +217,18 @@ function setView(next) {
   $("#view-label").textContent = collectionFilter ? collectionFilter + (categoryFilter ? " / " + categoryFilter : "") : {all:"All components",installed:"In this project",updates:"Updates available"}[scope];
   $("#search").placeholder = collectionFilter ? "Search " + collectionFilter : "Search all components";
 }
+function browseLibrary(collection = "", category = "", scope = "all", expand = true) {
+  collectionFilter = collection; categoryFilter = category;
+  checkedComponents.clear(); selectionAnchor = null;
+  selectedId = null; selectedRevision = null; selectedDetail = null; catalogPage = 0;
+  $("#search").value = ""; $("#status-filter").value = scope;
+  // Keep the existing tree nodes: replacing a clicked summary interrupts its
+  // native disclosure action. Folder labels expand their ancestor chain.
+  if (expand) document.querySelectorAll(".library-group").forEach(group => {
+    if (isInLibrary(collection, group.dataset.library)) group.open = true;
+  });
+  setView("catalog"); renderCatalog(); $("#catalog").scrollTop = 0;
+}
 function renderCatalog() {
   const search = $("#search").value.trim().toLowerCase(), scope = $("#status-filter").value;
   visibleComponents = state.catalog.filter(c => (!collectionFilter || (categoryFilter ? c.collection===collectionFilter : isInLibrary(c.collection, collectionFilter))) && (!categoryFilter || categoryName(c) === categoryFilter) && matchesScope(c, scope) && (!$("#has-footprint").checked || !!c.assets?.footprint) && (!$("#has-model").checked || !!c.assets?.models?.length) && [c.name,c.id,c.description,c.manufacturer,c.mpn,c.collection,c.category].some(s => String(s || "").toLowerCase().includes(search)));
@@ -233,7 +245,7 @@ function renderCatalog() {
   }).join("")}</tbody></table>` : `<div class="empty"><h3>${state.catalog.length ? "No matching components" : "Your catalog is empty"}</h3><p>${state.catalog.length ? "Change the search or filter to see more components." : "Import a KiCad, Eagle, or Altium library, or open a saved library ZIP."}</p>${state.catalog.length ? '<button class="button" id="clear-filters">Clear filters</button>' : '<button class="button" data-open-import>Import components…</button>'}</div>`;
   if ($("#clear-filters")) $("#clear-filters").onclick = () => { collectionFilter = ""; categoryFilter = ""; $("#search").value = ""; $("#status-filter").value = "all";$("#has-footprint").checked=false;$("#has-model").checked=false; renderCatalog(); setView("catalog"); };
   if(visibleComponents.length>PAGE_SIZE){const pages=Math.ceil(visibleComponents.length/PAGE_SIZE);$('#catalog').insertAdjacentHTML('afterbegin',`<div class="catalog-pages"><button class="button small" id="page-prev" ${catalogPage===0?'disabled':''}>← Previous</button><span>Page ${catalogPage+1} of ${pages} · ${visibleComponents.length} matches</span><button class="button small" id="page-next" ${catalogPage+1===pages?'disabled':''}>Next →</button></div>`);for(const [id,delta] of [['page-prev',-1],['page-next',1]])$('#'+id).onclick=()=>{catalogPage+=delta;selectedId=visibleComponents[catalogPage*PAGE_SIZE]?.id;selectedRevision=null;renderCatalog();$('#catalog').scrollTop=0;};}
-  $('#export-matches').disabled=!visibleComponents.length;
+  $('#export-all').disabled=!state.catalog.length&&!state.libraries?.length;
   updateSelection();
   if ($("#select-visible")) $("#select-visible").onchange = e => {for (const c of visibleComponents) {if (e.target.checked) checkedComponents.add(c.id); else checkedComponents.delete(c.id);} updateSelection();};
   setView(view);
@@ -271,11 +283,10 @@ function renderInspector() {
   else if (inspectorTab === "model") content = modelViewerHTML(d);
   else if (inspectorTab === "assets") content = `<h3>Bundled assets</h3><ul class="asset-list"><li>Symbol<strong>${c.assets.symbol?"Included":"Not present"}</strong></li><li>Footprint<strong>${c.assets.footprint?"Included":"Unassigned"}</strong></li><li>3D models<strong>${c.assets.models.length}</strong></li><li>Documents<strong>${c.assets.documents.length}</strong></li></ul>${[c.assets.symbol, c.assets.footprint, ...c.assets.models, ...c.assets.documents].filter(Boolean).map(file => `<div class="asset-file">${uiIcon("component")}<span>${escapeHTML(typeof file === "string" ? file : file.path || JSON.stringify(file))}</span></div>`).join("")}<div class="property-heading">PIN / PAD MAPPING</div><div class="mapping">${(c.pins || []).slice(0,100).map(pin => `<span>${escapeHTML(pin)} ${c.pads?.includes(pin)?"↔ "+escapeHTML(pin):"· no matching pad"}</span>`).join("")}${(c.pins?.length||0)>100?"<span>…</span>":""}</div><p class="hint">${c.kind==='library_entry'?c.mapping_status==='matched'?'Matching identifiers; check physical pin assignments.':'Native library entry. Pin/pad mapping is not verified.':'Matching identifiers. Check physical pin assignments against the datasheet.'}</p>`;
   else content = `<h3>Source and integrity</h3><div class="source-code">${escapeHTML(JSON.stringify(c.provenance.source || {note:"Source location was not recorded."}, null, 2))}</div>${reportHTML(c.provenance.conversions)}<div class="property-heading">COMPONENT DIGEST</div><div class="source-code">${escapeHTML(d.digest)}</div><details><summary>Original source files</summary><pre>${escapeHTML(JSON.stringify(c.provenance.files, null, 2))}</pre></details>`;
-  target.innerHTML = `<div class="panel-heading"><h2>Inspector</h2><select id="detail-revision" aria-label="Component revision">${(catalog?.revisions || [c.revision]).map(r => `<option value="${r}" ${r === c.revision ? "selected" : ""}>Revision ${r}</option>`).join("")}</select></div><div class="inspector-heading"><h2>${escapeHTML(c.name)}</h2><p class="component-id">${escapeHTML(c.id)}</p></div><div class="inspector-tabs" role="tablist" aria-label="Component information">${["overview","model","assets","source"].map(name => `<button role="tab" id="tab-${name}" data-inspector-tab="${name}" aria-controls="inspector-panel" tabindex="${inspectorTab === name ? 0 : -1}" aria-selected="${inspectorTab === name}">${name === "model" ? "3D model" : name[0].toUpperCase() + name.slice(1)}</button>`).join("")}</div><div class="inspector-content" id="inspector-panel" role="tabpanel" aria-labelledby="tab-${inspectorTab}" tabindex="0">${content}</div><div class="inspector-actions"><button class="button" id="edit-properties" ${c.revision!==catalog?.revision?'disabled title="Select the latest revision to edit properties"':''}>Edit properties…</button><button class="button" id="delete-component" title="Move all revisions to Recently deleted">Delete…</button><button class="button" id="export-component" title="Export selected revision">Export…</button><button class="button primary project-only" id="add-component" ${!state.project || c.kind==='library_entry' || installed?.revision === c.revision ? "disabled" : ""}>${installed?.revision === c.revision ? "Installed · r" + c.revision : installed ? "Review change…" : "Add to project…"}</button></div>`;
+  target.innerHTML = `<div class="panel-heading"><h2>Inspector</h2><select id="detail-revision" aria-label="Component revision">${(catalog?.revisions || [c.revision]).map(r => `<option value="${r}" ${r === c.revision ? "selected" : ""}>Revision ${r}</option>`).join("")}</select></div><div class="inspector-heading"><h2>${escapeHTML(c.name)}</h2><p class="component-id">${escapeHTML(c.id)}</p></div><div class="inspector-tabs" role="tablist" aria-label="Component information">${["overview","model","assets","source"].map(name => `<button role="tab" id="tab-${name}" data-inspector-tab="${name}" aria-controls="inspector-panel" tabindex="${inspectorTab === name ? 0 : -1}" aria-selected="${inspectorTab === name}">${name === "model" ? "3D model" : name[0].toUpperCase() + name.slice(1)}</button>`).join("")}</div><div class="inspector-content" id="inspector-panel" role="tabpanel" aria-labelledby="tab-${inspectorTab}" tabindex="0">${content}</div><div class="inspector-actions"><button class="button" id="edit-properties" ${c.revision!==catalog?.revision?'disabled title="Select the latest revision to edit properties"':''}>Edit properties…</button><button class="button" id="delete-component" title="Move all revisions to Recently deleted">Delete…</button><button class="button primary project-only" id="add-component" ${!state.project || c.kind==='library_entry' || installed?.revision === c.revision ? "disabled" : ""}>${installed?.revision === c.revision ? "Installed · r" + c.revision : installed ? "Review change…" : "Add to project…"}</button></div>`;
   $("#edit-properties").onclick = () => editComponentProperties(c);
   $("#detail-revision").onchange = e => selectComponent(c.id, Number(e.target.value));
   $("#delete-component").onclick = () => deleteComponents([catalog]);
-  $("#export-component").onclick = () => openExport(c);
   $("#add-component").onclick = () => installPlan(c.id, c.revision);
   wireModelViewer(d);
 }
@@ -598,25 +609,41 @@ async function nativeImport(folder) {
   } catch (error) {if(progress.current()){openImport();$("#import-error").textContent=error.message;}}
   finally {progress.stop();busyImport=false;}
 }
-function saveCollection(saveAs = false) {openExport(null,saveAs);}
-function openExport(component = null, saveAs = null) {
-  const wholeCollection=saveAs!==null;
-  const selected = wholeCollection ? null : Array.isArray(component) ? component.map(({id,revision}) => [id,revision]) : component ? [[component.id,component.revision]] : (collectionFilter || $("#search").value || $("#has-footprint").checked || $("#has-model").checked) ? visibleComponents.map(({id,revision}) => [id,revision]) : null;
-  const name = wholeCollection ? state.package_options?.name || "Component collection" : Array.isArray(component) ? (collectionFilter || "Selected components") : component?.name || collectionFilter || state.package_options?.name || "Component collection";
-  const stem=slug(name);
-  const defaults={name,identifier:`local.kicad-component-packager.${stem.slice(0,40)}`,version:'1.0.0',author:'Local collection',license:'See bundled source notices',library_prefix:'PCM_',...(state.package_options||{}),name};
-  showModal(wholeCollection ? "Save library ZIP" : "Export library ZIP", `<p class="modal-intro">${selected ? `Export ${selected.length} selected component${selected.length === 1 ? "" : "s"}.` : "Save every component in your catalog."}</p><p class="hint">This ZIP works in KiCad PCM and reopens here with its library tree, properties, models, source assets, and revision history. KiCad uses the selected revision of each component.</p><form id="export-form"><div id="pcm-export-fields"><p class="note">In KiCad 10, open Plugin and Content Manager → Install from File and choose this ZIP.</p><div class="form-grid">${[['name','Package name'],['identifier','Package identifier'],['version','Package version'],['author','Package author'],['license','License / source notices']].map(([key,label])=>`<label class="field ${key==='name'?'full':''}"><span>${label}</span><input id="pcm-${key}" value="${escapeHTML(defaults[key])}" required></label>`).join('')}</div><details><summary>Library registration</summary><label class="field"><span>KiCad library nickname prefix</span><input id="pcm-library_prefix" value="${escapeHTML(defaults.library_prefix)}"><small>Match KiCad’s Packages and Updates preference. PCM_ is the default. Keep automatic library registration enabled.</small></label></details></div><div id="export-error" class="inline-error"></div><div class="form-actions"><button class="button" type="button" id="cancel-export">Cancel</button><button class="button primary" type="submit" id="save-export">Save ZIP…</button></div></form>`);
+function openExport(initialScope = null) {
+  const inspected = state.catalog.find(c => c.id === selectedId);
+  const selections = {
+    all: null,
+    view: visibleComponents.map(({id, revision}) => [id, revision]),
+    selected: selectedComponents().map(({id, revision}) => [id, revision]),
+    component: inspected ? [[inspected.id, selectedRevision || inspected.revision]] : []
+  };
+  const filtered = collectionFilter || categoryFilter || $("#search").value || $("#has-footprint").checked || $("#has-model").checked || $("#status-filter").value !== "all";
+  const scope = initialScope || (selections.selected.length ? "selected" : filtered ? "view" : "all");
+  const names = {all:state.package_options?.name || "Component collection", view:libraryLabel(collectionFilter) || "Filtered components", selected:"Selected components", component:inspected?.name || "Component"};
+  const labels = {all:`Entire collection — ${state.catalog.length} components`, view:`Current view — ${selections.view.length} components`, selected:`Checked components — ${selections.selected.length} components`, component:inspected ? `This component — ${inspected.name} (revision ${selectedRevision || inspected.revision})` : "This component — none selected"};
+  const descriptions = {all:"Includes every library folder and component, regardless of the current filters.", view:"Includes every match in the current folder, search and asset filters, across all pages.", selected:"Includes only the components whose checkboxes are selected.", component:"Includes the revision currently selected in the inspector."};
+  const identifier = name => `local.kicad-component-packager.${slug(name).slice(0,40)}`;
+  const defaults = {name:names[scope],identifier:identifier(names[scope]),version:'1.0.0',author:'Local collection',license:'See bundled source notices',library_prefix:'PCM_',...(state.package_options||{})};
+  showModal("Export ZIP", `<p class="modal-intro">One ZIP for KiCad PCM and Packager. Reopen it here with its library tree, properties, linked assets and revision history.</p><form id="export-form"><label class="field"><span>Include</span><select id="export-scope">${Object.entries(labels).map(([key,label])=>`<option value="${key}" ${key===scope?'selected':''} ${key!=='all'&&!selections[key].length?'disabled':''}>${escapeHTML(label)}</option>`).join('')}</select><small id="export-scope-description">${descriptions[scope]}</small></label><div id="pcm-export-fields"><div class="form-grid">${[['name','Package name'],['identifier','Package identifier'],['version','Package version'],['author','Package author'],['license','License / source notices']].map(([key,label])=>`<label class="field ${key==='name'?'full':''}"><span>${label}</span><input id="pcm-${key}" value="${escapeHTML(defaults[key])}" required></label>`).join('')}</div><details><summary>Library registration</summary><label class="field"><span>KiCad library nickname prefix</span><input id="pcm-library_prefix" value="${escapeHTML(defaults.library_prefix)}"><small>Match KiCad’s Packages and Updates preference. PCM_ is the default.</small></label></details><p class="hint">In KiCad 10: Plugin and Content Manager → Install from File. Your local catalog saves changes automatically.</p></div><div id="export-error" class="inline-error"></div><div class="form-actions"><button class="button" type="button" id="cancel-export">Cancel</button><button class="button primary" type="submit" id="save-export">Export ZIP…</button></div></form>`);
   $("#cancel-export").onclick=()=>modal.close();
+  $("#export-scope").onchange=()=>{
+    const chosen=$("#export-scope").value;
+    $("#export-scope-description").textContent=descriptions[chosen];
+    $("#save-export").disabled=chosen!=='all'&&!selections[chosen].length;
+  };
+  $("#export-scope").onchange();
   $("#export-form").onsubmit=async event=>{
     event.preventDefault();const button=$("#save-export");button.disabled=true;
+    const chosen=$("#export-scope").value, selected=selections[chosen];
     const options=Object.fromEntries(["name","identifier","version","author","license","library_prefix"].map(key=>[key,$("#pcm-"+key).value]));
     const query=new URLSearchParams({options:JSON.stringify(options)});
     if(selected)query.set('selections',JSON.stringify(selected));
     try {
+      if(!Object.hasOwn(selections,chosen) || (selected&&!selected.length))throw new Error('Choose a scope containing components.');
       let saved;
-      if(wholeCollection && window.partshelfDesktop?.saveCollection) {
-        saved=await window.partshelfDesktop.saveCollection(saveAs,options);
-        if(saved)toast('Library ZIP saved: '+saved.saved.split(/[\\/]/).pop());
+      if(chosen==='all' && window.partshelfDesktop?.saveCollection) {
+        saved=await window.partshelfDesktop.saveCollection(true,options);
+        if(saved)toast('Library ZIP exported: '+saved.saved.split(/[\\/]/).pop());
       } else saved=await download('pcm-package?'+query,options.name.replace(/[^a-zA-Z0-9_-]+/g,'_')+'.zip');
       if(saved){if(!selected)state.package_options=options;modal.close();}
     }catch(error){$('#export-error').textContent=error.message;}
@@ -639,27 +666,29 @@ function projectPicker() {
 }
 $("#close-modal").onclick=()=>modal.close();
 $("#import-button").onclick=openImport;$("#project-picker").onclick=projectPicker;
-$('#has-footprint').onchange=renderCatalog;$('#has-model').onchange=renderCatalog;$('#export-matches').onclick=()=>openExport(visibleComponents);
+$('#has-footprint').onchange=renderCatalog;$('#has-model').onchange=renderCatalog;
 $("#search").oninput=renderCatalog;$("#status-filter").onchange=()=>{renderCatalog();setView("catalog");};
 $("#refresh-button").onclick=()=>refresh().catch(showError);
 $("#export-all").onclick=()=>openExport();
-$("#save-collection").onclick=()=>saveCollection();
 $("#new-library").onclick=createLibrary;
-$("#direct-install").onclick=projectPicker;
 $("#library-mode").onclick=()=>setProjectMode(false);
 $("#delete-selection").onclick=()=>deleteComponents(selectedComponents());
 $("#recently-deleted").onclick=openRecentlyDeleted;
 $("#clear-selection").onclick=()=>{checkedComponents.clear(); updateSelection();};
 $("#edit-selection").onclick=editSelectedProperties;
 $("#move-selection").onclick=()=>moveComponentsToLibrary(selectedComponents()).catch(showError);
-$("#export-selection").onclick=()=>openExport(selectedComponents());
 document.addEventListener("click",e=>{
-  const button=e.target.closest("button");if(!button)return;
+  const button=e.target.closest("button");
+  if(!button) {
+    const summary=e.target.closest(".library-group > summary");
+    if(summary)browseLibrary(summary.closest(".library-group").dataset.library,"","all",false);
+    return;
+  }
   if(button.dataset.view) {
-    if(button.dataset.scope) {collectionFilter="";categoryFilter="";checkedComponents.clear();$("#status-filter").value=button.dataset.scope;renderCatalog();}
+    if(button.dataset.scope) browseLibrary("","",button.dataset.scope);
     setView(button.dataset.view);
   }
-  if(button.dataset.collection) {e.preventDefault();collectionFilter=button.dataset.collection;categoryFilter=button.dataset.category || "";checkedComponents.clear();$("#search").value="";$("#status-filter").value="all";renderCategories();renderCatalog();setView("catalog");}
+  if(button.dataset.collection) {e.preventDefault();browseLibrary(button.dataset.collection,button.dataset.category || "");}
   if(button.dataset.sort) {sortDirection=sortKey===button.dataset.sort?-sortDirection:1;sortKey=button.dataset.sort;renderCatalog();}
   if(button.dataset.inspectorTab) {inspectorTab=button.dataset.inspectorTab;renderInspector();$("#tab-"+inspectorTab).focus();}
   if(button.hasAttribute("data-open-import"))openImport();
@@ -710,8 +739,7 @@ function command(name) {
   if (name === "close-project" && state.project) changeProject("close-project", state.project.path);
   if (name === "search") {setView("catalog");$("#search").focus();$("#search").select();}
   if (name === "refresh") refresh().catch(showError);
-  if (name === "export") openExport();
-  if (name === "save" || name === "save-as") saveCollection(name === "save-as");
+  if (["export", "save", "save-as"].includes(name)) openExport();
 }
 document.addEventListener("keydown", event => {
   if (!(event.metaKey || event.ctrlKey) || event.altKey) return;

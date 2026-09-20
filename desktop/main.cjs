@@ -51,9 +51,7 @@ function installMenu() {
     {label:"Open Library Collection…",accelerator:"CmdOrCtrl+O",click:() => notify("open")},
     {label:"Direct Install into KiCad Project…",click:() => notify("project")},
     {label:"Close Active Project",accelerator:"CmdOrCtrl+Shift+W",click:() => notify("close-project")},
-    {label:"Save Library ZIP",accelerator:"CmdOrCtrl+S",click:() => notify("save")},
-    {label:"Save Library ZIP As…",accelerator:"CmdOrCtrl+Shift+S",click:() => notify("save-as")},
-    {label:"Export for KiCad…",click:() => notify("export")},{type:"separator"},
+    {label:"Export ZIP…",accelerator:"CmdOrCtrl+S",click:() => notify("export")},{type:"separator"},
     {label:"Show Catalog Folder",click:async () => {await fs.mkdir(path.join(dataDir,"catalog"),{recursive:true});shell.showItemInFolder(path.join(dataDir,"catalog"));}},
     process.platform === "darwin" ? {role:"close"} : {role:"quit"}
   ]});
@@ -72,7 +70,7 @@ function registerIPC() {
       let destination = collectionFile;
       if (saveAs || !destination) {
         const filename = typeof options?.name === 'string' ? options.name.replace(/[<>:"/\\|?*]/g, '_') : 'Components';
-        const chosen = await dialog.showSaveDialog(window,{title:"Save Library ZIP",defaultPath:destination || path.join(app.getPath("documents"),filename + ".zip"),filters:[{name:"KiCad PCM library",extensions:["zip"]}],properties:["createDirectory","showOverwriteConfirmation"]});
+        const chosen = await dialog.showSaveDialog(window,{title:"Export Library ZIP",defaultPath:destination || path.join(app.getPath("documents"),filename + ".zip"),filters:[{name:"KiCad PCM library",extensions:["zip"]}],properties:["createDirectory","showOverwriteConfirmation"]});
         if (chosen.canceled) return null;
         destination = chosen.filePath;
       }
