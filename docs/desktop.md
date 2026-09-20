@@ -6,8 +6,8 @@ The desktop application has its own window, application menus, native Open/Save 
 
 Fresh installations start with an empty catalog and no library folders. Demo components and Core libraries are not bundled or imported automatically. Updates retain your existing local catalog, so components you previously imported will still appear.
 
-- **Mac, Apple Silicon:** Extract `KiCad-Component-Packager-0.1.11-macOS-AppleSilicon.zip` and open `KiCad Component Packager.app`. You can move the app to Applications. Tested on macOS 15.3.1; Intel Macs use the separate macOS-Intel release ZIP.
-- **Windows, x64:** Extract **the entire** `KiCad-Component-Packager-0.1.11-Windows-x64.zip`, then open `KiCad Component Packager.exe` inside its folder. Keep the adjacent files and `resources` folder together. Python and Node do not need to be installed.
+- **Mac, Apple Silicon:** Extract `KiCad-Component-Packager-0.1.12-macOS-AppleSilicon.zip` and open `KiCad Component Packager.app`. You can move the app to Applications. Tested on macOS 15.3.1; Intel Macs use the separate macOS-Intel release ZIP.
+- **Windows, x64:** Extract **the entire** `KiCad-Component-Packager-0.1.12-Windows-x64.zip`, then open `KiCad Component Packager.exe` inside its folder. Keep the adjacent files and `resources` folder together. Python and Node do not need to be installed.
 
 These are local preview builds. The Mac app has a verified ad hoc signature, without Apple Developer ID signing or notarization. The Windows executable has no publisher certificate. Public distribution signing and an installer are future release steps.
 
