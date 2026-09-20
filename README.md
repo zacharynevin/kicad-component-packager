@@ -6,6 +6,10 @@ An independent companion to KiCad, built with Electron and Python. This reposito
 
 [Download a preview release](https://github.com/zacharynevin/kicad-component-packager/releases) · [Desktop guide](docs/desktop.md) · [Build instructions](docs/building.md) · [Report a problem](https://github.com/zacharynevin/kicad-component-packager/issues)
 
+![Library browser with nested Core folders, manufacturer and part-number columns, 3D model indicators, and a connector's symbol and footprint previews](docs/images/library-browser.jpg)
+
+Organize libraries into folders and inspect a component's linked assets alongside the component list.
+
 ## What it does
 
 - Import KiCad libraries, native PCM ZIPs, Eagle libraries and board modules, and supported Altium files. Public GitHub repositories and direct download links are also supported.
@@ -17,6 +21,18 @@ An independent companion to KiCad, built with Electron and Python. This reposito
 - Save and export the same PCM ZIP format. Full saves preserve the library tree, source assets, package settings and component history; selected exports include the chosen components and their dependencies.
 
 The [Core library tools](tools/core_library/README.md) reorganize the full standard KiCad selection while preserving unpaired generic and utility symbols. Desktop PCM import supports these large collections, including standalone footprints. Asset filters describe what is bundled, rather than certifying a part’s physical suitability.
+
+## A closer look
+
+Review the symbol, footprint and pin-to-pad identifiers before saving an imported component.
+
+![Component import review showing a resistor symbol, its 0603 footprint, two matching pin identifiers, and the Save to catalog button](docs/images/component-review.jpg)
+
+Pan, zoom and orbit the 3D preview. Offset, rotation and scale adjustments appear immediately; save the finished alignment as a new revision.
+
+![3D alignment dialog showing a Hirose microSD connector model, view controls, offset, rotation and scale fields, and Save new revision](docs/images/model-alignment.jpg)
+
+Screenshots show version 0.1.10 on macOS with a demonstration catalog using public KiCad components and the bundled example library. The pictured Core collection is sample content, separate from the application download.
 
 ## Download and run
 
