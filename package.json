@@ -1,0 +1,37 @@
+{
+  "name": "kicad-component-packager",
+  "productName": "KiCad Component Packager",
+  "version": "0.1.10",
+  "description": "Import, bundle, and install component libraries for KiCad",
+  "private": true,
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "desktop": "electron .",
+    "package:desktop": "node desktop/package.mjs",
+    "check:desktop": "node --test tests/*.test.cjs",
+    "build:viewer": "node desktop/build-viewer.mjs",
+    "predesktop": "npm run build:viewer",
+    "setup": "node desktop/setup.mjs"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "@resvg/resvg-js": "2.6.2",
+    "electron": "44.4.3",
+    "esbuild": "0.28.2",
+    "occt-import-js": "0.0.23",
+    "three": "0.186.0"
+  },
+  "license": "MIT",
+  "author": "Zachary Nevin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zacharynevin/kicad-component-packager.git"
+  },
+  "homepage": "https://github.com/zacharynevin/kicad-component-packager",
+  "bugs": {
+    "url": "https://github.com/zacharynevin/kicad-component-packager/issues"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

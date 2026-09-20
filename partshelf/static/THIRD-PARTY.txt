@@ -1,0 +1,7 @@
+Interactive 3D viewport dependencies
+
+three.js 0.186.0 (MIT): https://github.com/mrdoob/three.js/tree/r186
+occt-import-js 0.0.23 (MIT): https://github.com/kovacsv/occt-import-js/tree/0.0.23
+Open CASCADE Technology (LGPL 2.1 with OCCT exception): https://github.com/kovacsv/occt-import-js/tree/0.0.23
+
+License texts are included beside this file. The OCCT WASM is a separate, replaceable asset. To rebuild or replace it, follow occt-import-js tools/build_wasm.py instructions at the source repository, replace dist/occt-import-js.js and .wasm, and run npm run build:viewer followed by npm run package:desktop. Packager does not modify OCCT WASM. desktop/viewer/csp-runtime.mjs replaces the JavaScript embind dynamic invokers with ordinary closures so string evaluation stays disabled.

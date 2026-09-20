@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.step -text -diff
+*.stp -text -diff
+*.png binary
+*.ico binary
+*.icns binary
+*.wasm binary

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kicad-component-packager"
+version = "0.1.10"
+description = "Portable, revisioned component libraries for KiCad"
+license = "MIT"
+authors = [{name = "Zachary Nevin"}]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+kicad-component-packager = "partshelf.cli:main"
+partshelf = "partshelf.cli:main"
+
+[tool.setuptools]
+packages = ["partshelf"]
+
+[tool.setuptools.package-data]
+partshelf = ["static/*"]

@@ -1,0 +1,5 @@
+PartShelf demonstration header
+
+Four numbered contacts, 2.54 mm pitch, 1.0 mm nominal drill.
+The bundled VRML model illustrates the housing only.
+This is an example for testing library packaging, not a manufacturer-qualified part.

@@ -1,0 +1,46 @@
+(kicad_symbol_lib
+  (version 20251024)
+  (generator "partshelf_examples")
+  (symbol "Resistor_10k"
+    (pin_names (offset 0) (hide yes))
+    (in_bom yes) (on_board yes)
+    (property "Reference" "R" (at 0 2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "10k" (at 0 -2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "Workshop:Passive_0603" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (property "Datasheet" "" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (property "Description" "10 kΩ resistor · 0603 demonstration component" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (symbol "Resistor_10k_0_1"
+      (rectangle (start -2.54 1.016) (end 2.54 -1.016) (stroke (width 0.254) (type default)) (fill (type none))))
+    (symbol "Resistor_10k_1_1"
+      (pin passive line (at -5.08 0 0) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
+      (pin passive line (at 5.08 0 180) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27)))))))
+  (symbol "Capacitor_100n"
+    (pin_names (offset 0) (hide yes))
+    (in_bom yes) (on_board yes)
+    (property "Reference" "C" (at 0 2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "100nF" (at 0 -2.54 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "Workshop:Passive_0603" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (property "Datasheet" "" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (property "Description" "100 nF capacitor · shared 0603 footprint and 3D asset" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (symbol "Capacitor_100n_0_1"
+      (polyline (pts (xy -0.635 1.905) (xy -0.635 -1.905)) (stroke (width 0.254) (type default)) (fill (type none)))
+      (polyline (pts (xy 0.635 1.905) (xy 0.635 -1.905)) (stroke (width 0.254) (type default)) (fill (type none))))
+    (symbol "Capacitor_100n_1_1"
+      (pin passive line (at -3.175 0 0) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
+      (pin passive line (at 3.175 0 180) (length 2.54) (name "~" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27)))))))
+  (symbol "Header_1x04"
+    (pin_names (offset 1.016))
+    (in_bom yes) (on_board yes)
+    (property "Reference" "J" (at 0 8.89 0) (effects (font (size 1.27 1.27))))
+    (property "Value" "1×04 header" (at 0 -8.89 0) (effects (font (size 1.27 1.27))))
+    (property "Footprint" "Workshop:Header_1x04_P2.54" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (property "Datasheet" "docs/header-notes.txt" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (property "Description" "Four-position header with a bundled model and local notes" (at 0 0 0) (hide yes) (effects (font (size 1.27 1.27))))
+    (symbol "Header_1x04_0_1"
+      (rectangle (start -2.54 7.62) (end 2.54 -7.62) (stroke (width 0.254) (type default)) (fill (type background))))
+    (symbol "Header_1x04_1_1"
+      (pin passive line (at -5.08 3.81 0) (length 2.54) (name "1" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
+      (pin passive line (at -5.08 1.27 0) (length 2.54) (name "2" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27)))))
+      (pin passive line (at -5.08 -1.27 0) (length 2.54) (name "3" (effects (font (size 1.27 1.27)))) (number "3" (effects (font (size 1.27 1.27)))))
+      (pin passive line (at -5.08 -3.81 0) (length 2.54) (name "4" (effects (font (size 1.27 1.27)))) (number "4" (effects (font (size 1.27 1.27)))))))
+)

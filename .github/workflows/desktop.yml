@@ -1,0 +1,105 @@
+name: Desktop builds
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: darwin-arm64
+            python_arch: arm64
+          - runner: macos-15-intel
+            target: darwin-x64
+            python_arch: x64
+          - runner: windows-2025
+            target: win32-x64
+            python_arch: x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          architecture: ${{ matrix.python_arch }}
+      - name: Check release version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: node -e "const v=require('./package.json').version; if(process.env.GITHUB_REF_NAME!=='v'+v) throw Error('Release tag must match package.json version')"
+      - run: npm ci
+      - run: npm run setup
+      - run: python -m unittest discover -s tests
+      - run: npm run build:viewer
+      - run: npm run check:desktop
+        env:
+          PARTSHELF_TEST_PYTHON: python
+      - run: npm run package:desktop -- ${{ matrix.target }}
+      - name: Smoke-test packaged backend
+        run: node tests/smoke_packaged.cjs
+      - uses: actions/upload-artifact@v6
+        with:
+          name: desktop-${{ matrix.target }}
+          path: |
+            outputs/desktop/*.zip
+            outputs/desktop/build-manifest.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  release:
+    name: Publish preview downloads
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          pattern: desktop-*
+          path: artifacts
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir release
+          for directory in artifacts/desktop-*; do
+            cp "$directory"/*.zip release/
+            cp "$directory/build-manifest.json" "release/$(basename "$directory")-manifest.json"
+          done
+          (cd release && sha256sum *.zip > SHA256SUMS.txt)
+          cat > release-notes.md <<'NOTES'
+          Preview build of KiCad Component Packager.
+
+          Download the ZIP for your platform and extract the entire archive. Python and the desktop runtime are included. Install KiCad 10+ separately for symbol/footprint previews and Eagle/Altium conversion.
+
+          macOS packages are ad hoc signed and not notarized. Windows packages are not publisher-signed. Automated tests and the packaged backend import/export checks passed on all three platforms; this does not replace manual GUI testing on each OS.
+
+          See the repository README and docs/building.md for source builds. SHA256SUMS.txt lists the download checksums.
+          NOTES
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release/* --clobber
+          else
+            gh release create "$RELEASE_TAG" release/* --verify-tag --prerelease --title "Component Packager $RELEASE_TAG (Preview)" --notes-file release-notes.md
+          fi

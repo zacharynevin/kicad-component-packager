@@ -1,0 +1,6 @@
+#VRML V2.0 utf8
+# Simple illustration, dimensions in KiCad VRML units (0.1 inch).
+Shape {
+  appearance Appearance { material Material { diffuseColor 0.22 0.24 0.25 } }
+  geometry Box { size 0.629921 0.314961 0.236220 }
+}

@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+.partshelf/
+outputs/
+.DS_Store
+node_modules/
+.desktop-build-env/
+
+# Separate native KiCad worktree and local-only artifacts
+kicad-workbench/
+.env
+.env.*
+*.log
+# Generated viewer runtime and icons (npm run build:viewer / package:desktop)
+partshelf/static/model-viewport.js
+partshelf/static/occt-import-js.js
+partshelf/static/occt-import-js.wasm
+partshelf/static/step-worker.js
+partshelf/static/license.*.txt
+desktop/assets/icon.png
+desktop/assets/icon.ico
+desktop/assets/icon.icns
+
+# Legacy local launcher
+Start PartShelf.command
